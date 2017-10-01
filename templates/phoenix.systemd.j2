@@ -7,8 +7,8 @@ Type=simple
 User=appuser
 Group=appuser
 WorkingDirectory=/phoenix/hello_release
-ExecStart=/phoenix/hello_release/bin/myapp foreground
-ExecStop=/phoenix/hello_release/bin/myapp stop
+ExecStart=/phoenix/hello_release/bin/hello_release foreground
+ExecStop=/phoenix/hello_release/bin/hello_release stop
 Restart=on-failure
 RestartSec=5
 Environment=PORT=4000
