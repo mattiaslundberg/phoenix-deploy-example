@@ -1,0 +1,20 @@
+[Unit]
+Description=Hello Release
+After=network.target
+
+[Service]
+Type=simple
+User=appuser
+Group=appuser
+WorkingDirectory=/phoenix/hello_release
+ExecStart=/phoenix/hello_release/bin/myapp foreground
+ExecStop=/phoenix/hello_release/bin/myapp stop
+Restart=on-failure
+RestartSec=5
+Environment=PORT=4000
+Environment=LANG=en_US.UTF-8
+SyslogIdentifier=hello_release
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target
