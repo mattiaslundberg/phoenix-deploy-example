@@ -1,0 +1,18 @@
+---
+droplet_name: "hello-release.mlundberg.se"
+letsencrypt_domain_name: "hello-release.mlundberg.se"
+droplet_size: "512mb"
+
+postgresql_databases:
+  - name: hellodeploy
+
+postgresql_users:
+  - name: hellodeploy
+    pass: password
+    encrypted: no
+
+postgresql_user_privileges:
+  - name: hellodeploy
+    db: hellodeploy
+    priv: "ALL"
+    role_attr_flags: "CREATEDB"

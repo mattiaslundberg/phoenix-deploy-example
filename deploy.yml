@@ -1,0 +1,35 @@
+- name: Build upgrade release
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Build the image
+      command: docker build -t mattiaslundberg/hello_release .
+
+    - name: Build release artifact
+      shell: docker run --volume $(pwd):/data --rm mattiaslundberg/hello_release /data/build.sh --upgrade
+
+- hosts: hello-release.mlundberg.se
+  remote_user: root
+
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+
+  tasks:
+    - name: Get release version
+      command: cat VERSION
+      delegate_to: localhost
+      register: current_version
+
+    - name: Create current release folder
+      file:
+        name: /phoenix/releases/{{ current_version.stdout }}
+        state: directory
+
+    - name: Upload new release
+      copy:
+        src: _build/prod/rel/hello_release/releases/{{ current_version.stdout }}/hello_release.tar.gz
+        dest: /phoenix/releases/{{ current_version.stdout }}/hello_release.tar.gz
+
+    - name: Activate new release
+      command: /phoenix/bin/hello_release upgrade {{ current_version.stdout }}

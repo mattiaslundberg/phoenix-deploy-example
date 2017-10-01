@@ -1,0 +1,102 @@
+- name: Setup digitalocean droplet
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - include_vars: vars.yml
+
+    - name: Create or Start droplet
+      digital_ocean:
+        unique_name: yes
+        state: present
+        command: droplet
+        name: "{{ droplet_name }}"
+        region_id: lon1
+        size_id: "{{ droplet_size }}"
+        image_id: ubuntu-16-04-x64
+        ssh_key_ids:
+          - "06:2a:1e:25:ae:ee:c9:6b:96:58:ae:8e:91:36:81:a3"
+        backups_enabled: no
+        ipv6: yes
+      register: droplets
+
+    - name: Add new host to inventory
+      add_host:
+        name: "{{ droplets.droplet.ip_address }}"
+        groups: droplet
+        ipv6_address: "{{ droplets.droplet.networks.v6[0].ip_address }}"
+        ipv6_network: "{{ droplets.droplet.networks.v6[0].gateway }}/{{ droplets.droplet.networks.v6[0].netmask }}"
+      when: droplets.droplet is defined
+
+    - name: Wait for port 22 to become available.
+      local_action:
+        module: wait_for
+        port: 22
+        host: "{{ droplets.droplet.ip_address }}"
+      when: droplets.droplet is defined
+
+- name: Build new release
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Build the image
+      command: docker build -t mattiaslundberg/hello_release .
+
+    - name: Build release artifact
+      shell: docker run --volume $(pwd):/data --rm mattiaslundberg/hello_release /data/build.sh --upgrade
+
+- hosts: droplet
+  remote_user: root
+
+  vars:
+    ansible_python_interpreter: "/usr/bin/python3"
+    letsencrypt_extra_location_blocks: ""
+    letsencrypt_email: "me@mlundberg.se"
+
+  roles:
+    - letsencrypt
+    - postgres
+
+  pre_tasks:
+    - include_vars: vars.yml
+
+    - name: Install postges python lib
+      apt:
+        name: python3-psycopg2
+
+  tasks:
+    - name: Get release version
+      command: cat VERSION
+      delegate_to: localhost
+      register: current_version
+
+    - name: Create current release folder
+      file:
+        name: /phoenix/
+        state: directory
+
+    - name: Upload new release
+      copy:
+        src: _build/prod/rel/hello_release/releases/{{ current_version.stdout }}/hello_release.tar.gz
+        dest: /phoenix/hello_release.tar.gz
+
+    - name: Unpack new releases
+      command: tar xf hello_release.tar.gz
+      args:
+        chdir: /phoenix
+
+    - name: Install systemd unit
+      template:
+        src: phoenix.systemd.j2
+        dest: /lib/systemd/system/phoenix.service
+
+    - name: Reload systemd units
+      command: systemctl daemon-reload
+
+    - name: Restart systemd unit
+      service:
+        name: phoenix.service
+        state: started
+        enabled: yes
