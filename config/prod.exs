@@ -15,7 +15,8 @@ use Mix.Config
 # which you typically run after static files are built.
 config :hello_release, HelloReleaseWeb.Endpoint,
   http: [port: {:system, "PORT"}],
-  url: [host: "hello-release.mlundberg.se", port: {:system, "PORT"}], # This is critical for ensuring web-sockets properly authorize.
+  # url: [host: "hello-release.mlundberg.se", port: {:system, "PORT"}], # This is critical for ensuring web-sockets properly authorize.
+  check_origin: false,
   cache_static_manifest: "priv/static/manifest.json",
   server: true,
   root: ".",
