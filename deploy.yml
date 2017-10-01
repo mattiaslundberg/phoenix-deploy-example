@@ -7,7 +7,7 @@
       command: docker build -t mattiaslundberg/hello_release .
 
     - name: Build release artifact
-      shell: docker run --volume $(pwd):/data --rm mattiaslundberg/hello_release /data/build.sh --upgrade
+      shell: docker run --entrypoint "/bin/bash" --volume $(pwd):/data --rm mattiaslundberg/hello_release /data/build.sh --upgrade
 
 - hosts: hello-release.mlundberg.se
   remote_user: root

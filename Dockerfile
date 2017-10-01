@@ -11,4 +11,4 @@ RUN dpkg -i erlang.deb &&\
 
 WORKDIR /data
 VOLUME /data
-ENTRYPOINT "/data/build.sh"
+ENTRYPOINT "/bin/bash"
