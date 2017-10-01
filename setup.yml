@@ -72,6 +72,11 @@
       delegate_to: localhost
       register: current_version
 
+    - name: Remove old release directory
+      file:
+        name: /phoenix/
+        state: absent
+
     - name: Create current release folder
       file:
         name: /phoenix/
