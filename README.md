@@ -1,6 +1,6 @@
 # Phoenix deploy example
 
-This is an example how to deploy [Phoenix](http://www.phoenixframework.org/) on a digitalocean droplet.
+This is an example how to deploy [Phoenix](http://www.phoenixframework.org/) on two servers.
 
 NOTE: This is not a complete example, it runs everything as root and uses default passwords
 It's indended for learning only
@@ -32,5 +32,6 @@ And access the nodes on http://localhost:4000 and http://localhost:4001 respecti
 Deployment is done using erlang releases using [ansible](https://www.ansible.com/) using artifacts built locally using docker.
 
 1. Install ansible 
-2. Run `ansible setup.yml` to create a new droplet and do a full installation of the app
-3. Update `VERSION`-file and run `ansible deploy.yml` to generate a upgrade of the running version
+2. Update `vars.yml` with your ssh keys and domains
+3. Run `ansible setup.yml` to create a new droplet and do a full installation of the app
+4. Update `VERSION`-file and run `ansible deploy.yml` to generate a upgrade of the running version

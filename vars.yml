@@ -1,7 +1,11 @@
 ---
 droplet_name: "hello-release.mlundberg.se"
 letsencrypt_domain_name: "hello-release.mlundberg.se"
+letsencrypt_email: "me@mlundberg.se"
 droplet_size: "512mb"
+ssh_keys:
+  - "06:2a:1e:25:ae:ee:c9:6b:96:58:ae:8e:91:36:81:a3"
+  - "61:3b:02:91:da:95:4a:6e:65:96:5d:02:a9:74:63:7d"
 
 postgresql_databases:
   - name: hellodeploy
